@@ -16,6 +16,7 @@ import {IconBookmark, IconChartBubble, IconCopy, IconFileExport,} from "@tabler/
 import React, {useEffect, useState} from "react";
 import {ChartCard} from "./ChartCard";
 import {multipliers, optionsFilter, optionsInterval, validChartTypes,} from "../utils/constants";
+import {convertDecimalToYearsAndMonths} from "../utils/util";
 
 export const UsageCard: React.FC = () => {
   const theme = useMantineTheme();
@@ -107,7 +108,8 @@ export const UsageCard: React.FC = () => {
 
   // Resulting sum calculation
   const Result = () => {
-    const availableYears = (startSum/(dcaSum*multipliers[interval])).toFixed(2);
+    const availableYears = (startSum/(dcaSum*multipliers[interval]));
+    const { years, months } = convertDecimalToYearsAndMonths(availableYears);
 
     return (
         <Group>
@@ -124,7 +126,7 @@ export const UsageCard: React.FC = () => {
               deg: 90,
             }}
           >
-            {availableYears} år
+            {years} år {months !== 0 && <>{months} mnd</>}
           </Badge>
         </Group>
     );
