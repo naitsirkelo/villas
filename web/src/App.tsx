@@ -11,6 +11,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { GraphPage } from "./pages/GraphPage";
 import { theme } from "./theme";
 import React from "react";
+import {UsagePage} from "./pages/UsagePage";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "graphs",
         element: <GraphPage />,
+      },
+      {
+        path: "usage",
+        element: <UsagePage />,
       },
     ],
   },

@@ -8,7 +8,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
-import { Icon, IconLayoutGrid, IconSearch } from "@tabler/icons-react";
+import {Icon, IconAccessible, IconLayoutGrid, IconSearch} from "@tabler/icons-react";
 import React from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 
@@ -28,6 +28,9 @@ export const Layout: React.FC = () => {
             </NavButton>
             <NavButton to="graphs" icon={IconSearch}>
               Grafer
+            </NavButton>
+            <NavButton to="usage" icon={IconAccessible}>
+              Forbruk
             </NavButton>
           </Stack>
         </Stack>
