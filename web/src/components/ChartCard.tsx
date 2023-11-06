@@ -27,7 +27,7 @@ export const ChartCard = ({
     series: [
       {
         type: chartType,
-        name: "series-1",
+        name: "Sum",
         data: xAxisData,
       },
     ],

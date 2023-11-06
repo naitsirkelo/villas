@@ -1,4 +1,4 @@
-import { Modal, Paper, Select, Switch, createTheme } from "@mantine/core";
+import { Modal, Paper, Select, Switch, createTheme, rem } from "@mantine/core";
 
 export const theme = createTheme({
   colors: {
@@ -61,15 +61,15 @@ export const theme = createTheme({
         input: {
           borderRadius: "var(--mantine-radius-lg)",
           boxShadow: "var(--mantine-shadow-xs)",
-          color: "var(--mantine-color-blue-9)",
           border: "none",
+          fontSize: rem(14),
         },
         option: {
           color: "var(--mantine-color-blue-9)",
         },
         dropdown: {
           borderRadius: "var(--mantine-radius-lg)",
-          boxShadow: "var(--mantine-shadow-xs)",
+          boxShadow: "var(--mantine-shadow-sm)",
           border: "none",
         },
       },

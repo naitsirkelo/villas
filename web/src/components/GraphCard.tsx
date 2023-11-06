@@ -33,8 +33,9 @@ export const GraphCard: React.FC = () => {
   const theme = useMantineTheme();
   const date = new Date().toDateString();
 
+  const initialInputSum = 1000;
   const validFirstYear = 2023;
-  const validEndYear = 2030;
+  const validEndYear = 2033;
   const optionsLastYear = 2123;
   const defaultInterval = "Månedlig";
   const validInterval: string = optionsInterval.includes(defaultInterval)
@@ -48,12 +49,18 @@ export const GraphCard: React.FC = () => {
   const [endYear, setEndYear] = useState<number>(validEndYear);
 
   const [totalYears, setTotalYears] = useState<number[]>([2023, 2024]);
-  const [dataArray, setDataArray] = useState<number[]>([1000, 1050]);
+  const [dataArray, setDataArray] = useState<number[]>([
+    initialInputSum,
+    initialInputSum * 1.05,
+  ]);
 
   const [interval, setInterval] = useState<string>(validInterval);
-  const [dcaSum, setDcaSum] = useState<number>(1000);
-  const [dcaCleanSum, setDcaCleanSum] = useState<number>(1000);
-  const [variationPercentage, setVariationPercentage] = useState<number>(0);
+  const [variationPercentage, setVariationPercentage] = useState<number>(7.5);
+
+  const [dcaSum, setDcaSum] = useState<number>(initialInputSum);
+  const [dcaCleanSum, setDcaCleanSum] = useState<number>(initialInputSum);
+
+  const [startSum, setStartSum] = useState<number>(0);
 
   // Graph handlers
   const handleSelectChange = (value: any) => {
@@ -61,9 +68,9 @@ export const GraphCard: React.FC = () => {
   };
 
   const handleStartYearChange = (value: any) => {
-    value = parseInt(value);
-    if (value >= validFirstYear && value !== startYear) {
-      setStartYear(value);
+    const parsedValue = parseInt(value);
+    if (parsedValue >= validFirstYear && parsedValue !== startYear) {
+      setStartYear(parsedValue);
     }
   };
 
@@ -83,6 +90,11 @@ export const GraphCard: React.FC = () => {
     setDcaSum(parseInt(value));
   };
 
+  const handleStartSumChange = (value: any) => {
+    if (!value) value = 0;
+    setStartSum(parseInt(value));
+  };
+
   const handleVariationChange = (value: any) => {
     setVariationPercentage(value);
   };
@@ -100,9 +112,10 @@ export const GraphCard: React.FC = () => {
 
   // Graph rendering
   const updateGraph = (start: number, end: number) => {
-    const years: number[] = Array(end - start + 1)
-      .fill(start)
-      .map((year, index) => year + index);
+    const years = Array.from(
+      { length: endYear - startYear + 1 },
+      (_, index) => startYear + index,
+    );
     setTotalYears(years);
   };
 
@@ -115,6 +128,26 @@ export const GraphCard: React.FC = () => {
     const years = endYear - startYear;
     return (
       <Group>
+        <Group>
+          <Text style={{ marginBottom: "25px" }}>Resultat (0%):</Text>
+          <Badge
+            style={{ marginBottom: "25px" }}
+            size="xl"
+            variant="gradient"
+            gradient={{
+              from: theme.colors.teal[4],
+              to: theme.colors.teal[5],
+              deg: 90,
+            }}
+          >
+            <CurrencyFormat
+              value={dcaCleanSum}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"Kr "}
+            />
+          </Badge>
+        </Group>
         <Group>
           <Text style={{ marginBottom: "25px" }}>
             Resultat ({variationPercentage}%):
@@ -138,34 +171,14 @@ export const GraphCard: React.FC = () => {
           </Badge>
         </Group>
         <Group>
-          <Text style={{ marginBottom: "25px" }}>Resultat (0%):</Text>
-          <Badge
-            style={{ marginBottom: "25px" }}
-            size="xl"
-            variant="gradient"
-            gradient={{
-              from: theme.colors.teal[4],
-              to: theme.colors.teal[5],
-              deg: 90,
-            }}
-          >
-            <CurrencyFormat
-              value={dcaCleanSum}
-              displayType={"text"}
-              thousandSeparator={true}
-              prefix={"Kr "}
-            />
-          </Badge>
-        </Group>
-        <Group>
           <Text style={{ marginBottom: "25px" }}>Forskjell:</Text>
           <Badge
             style={{ marginBottom: "25px" }}
             size="xl"
             variant="gradient"
             gradient={{
-              from: theme.colors.teal[4],
-              to: theme.colors.teal[5],
+              from: theme.colors.green[3],
+              to: theme.colors.green[7],
               deg: 90,
             }}
           >
@@ -191,9 +204,17 @@ export const GraphCard: React.FC = () => {
 
     let val = 0;
     let valClean = 0;
-    data.push(0);
-    dataNoReturn.push(0);
+
+    data.push(startSum); // Year 0 = initiell investert startSum, for graph output
+    dataNoReturn.push(startSum);
+
     totalYears.slice(1).forEach((_year, index) => {
+
+      if (startSum !== 0 && index === 0) {
+        val += startSum;
+        valClean += startSum;
+      }
+
       val += dcaSum * multipliers[interval];
       val *= 1 + 0.01 * variationPercentage;
 
@@ -206,12 +227,12 @@ export const GraphCard: React.FC = () => {
     return data;
   };
 
+  //TODO: Legg til DCA ut, som kan settes fra f.eks år 10.
+
   useEffect(() => {
     const generatedData = generateData();
     setDataArray(generatedData);
-    console.log(generatedData);
-    console.log(totalYears);
-  }, [dcaSum, variationPercentage, interval, totalYears]);
+  }, [dcaSum, startSum, variationPercentage, interval, totalYears]);
 
   return (
     <Card style={{ width: "80%" }}>
@@ -233,6 +254,7 @@ export const GraphCard: React.FC = () => {
             searchable
             onChange={(value) => handleStartYearChange(value)}
             allowDeselect={false}
+            style={{ width: "25%" }}
           />
           <Select
             label="Til"
@@ -244,7 +266,18 @@ export const GraphCard: React.FC = () => {
             searchable
             onChange={(value) => handleEndYearChange(value)}
             allowDeselect={false}
+            style={{ width: "25%" }}
           />
+          <Badge
+              size="lg"
+              style={{
+                marginTop: rem(25),
+                backgroundColor: theme.colors.teal[1],
+                color: theme.colors.blue[8],
+              }}
+          >
+            {endYear - startYear} år
+          </Badge>
           <Select
             label="Tidsintervall"
             placeholder={defaultInterval}
@@ -255,25 +288,32 @@ export const GraphCard: React.FC = () => {
             searchable
             onChange={(value) => handleIntervalChange(value)}
             allowDeselect={false}
+            style={{ width: "30%" }}
           />
-          <Badge
-            size="lg"
-            style={{
-              marginTop: rem(25),
-              backgroundColor: theme.colors.teal[1],
-              color: theme.colors.blue[8],
-            }}
-          >
-            {endYear - startYear} år
-          </Badge>
         </Group>
 
         <Group style={{ marginBottom: "25px" }}>
           <NumberInput
+            style={{ width: "25%" }}
+            label="Inne ved start"
+            size="sm"
+            placeholder="Velg sum"
+            defaultValue={initialInputSum * 10}
+            value={startSum}
+            min={-10000000}
+            max={10000000}
+            allowDecimal={false}
+            allowNegative={false}
+            thousandSeparator=","
+            rightSection={<IconChartBubble />}
+            onChange={(value) => handleStartSumChange(value)}
+          />
+          <NumberInput
+            style={{ width: "25%" }}
             label="Sparesum"
             size="sm"
             placeholder="Velg DCA"
-            defaultValue={1000}
+            defaultValue={initialInputSum}
             value={dcaSum}
             min={0}
             max={100000}
@@ -284,19 +324,20 @@ export const GraphCard: React.FC = () => {
             onChange={(value) => handleDcaChange(value)}
           />
           <NumberInput
-            label="Variasjon"
-            size="sm"
-            placeholder="Velg %"
-            suffix=" %"
-            defaultValue={0}
-            value={variationPercentage}
-            min={-100}
-            max={10000}
-            allowDecimal={true}
-            allowNegative={true}
-            thousandSeparator=","
-            rightSection={<IconChartDonut />}
-            onChange={(value) => handleVariationChange(value)}
+              style={{ width: "25%" }}
+              label="Variasjon"
+              size="sm"
+              placeholder="Velg %"
+              suffix=" %"
+              defaultValue={0}
+              value={variationPercentage}
+              min={-100}
+              max={10000}
+              allowDecimal={true}
+              allowNegative={true}
+              thousandSeparator=","
+              rightSection={<IconChartDonut />}
+              onChange={(value) => handleVariationChange(value)}
           />
         </Group>
 
