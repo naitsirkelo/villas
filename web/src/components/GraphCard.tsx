@@ -60,7 +60,7 @@ export const GraphCard: React.FC = () => {
   const [dcaSum, setDcaSum] = useState<number>(initialInputSum);
   const [dcaCleanSum, setDcaCleanSum] = useState<number>(initialInputSum);
 
-  const [startSum, setStartSum] = useState<number>(0);
+  const [startSum, setStartSum] = useState<number>(initialInputSum*10);
 
   // Graph handlers
   const handleSelectChange = (value: any) => {

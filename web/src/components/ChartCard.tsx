@@ -15,13 +15,34 @@ export const ChartCard = ({
 }: ChartCardProps) => {
   const theme = useMantineTheme();
 
-  const state = {
+  const config = {
     options: {
       chart: {
         id: chartType,
       },
       xaxis: {
         categories: xAxisCategories,
+      },
+      yaxis: {
+        labels: {
+          style: {
+            fontSize: '12px',
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontWeight: 500,
+          },
+          formatter: function (value: number) {
+            return value.toLocaleString("no-NO");
+          }
+        }
+      },
+      fill: {
+        opacity: [0.7],
+        colors: [theme.colors.teal[3]],
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: [theme.colors.teal[5]],
       },
     },
     series: [
@@ -31,17 +52,14 @@ export const ChartCard = ({
         data: xAxisData,
       },
     ],
-    fill: {
-      colors: [theme.colors.teal[7], "#E91E63", "#9C27B0"],
-    },
   };
 
   return (
     <div style={{ marginLeft: "10px" }}>
       <ReactApexChart
         key={chartType}
-        options={state.options}
-        series={state.series}
+        options={config.options}
+        series={config.series}
         width="750"
       />
     </div>
