@@ -107,7 +107,7 @@ export const UsageCard: React.FC = () => {
 
   // Resulting sum calculation
   const Result = () => {
-    const availableYears = (initialUsageSum/(dcaSum*multipliers[interval])).toFixed(2);
+    const availableYears = (startSum/(dcaSum*multipliers[interval])).toFixed(2);
 
     return (
         <Group>
@@ -159,7 +159,7 @@ export const UsageCard: React.FC = () => {
   useEffect(() => {
     const generatedData = generateData();
     setDataArray(generatedData);
-  }, [dcaSum, startSum, interval, totalYears]);
+  }, [dcaSum, startSum, setStartSum, interval, totalYears]);
 
   return (
     <Card style={{ width: "80%" }}>
