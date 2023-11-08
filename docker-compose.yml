@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  database:
+    image: sqlserver-image
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    networks:
+      - my-network
+    environment:
+      - ACCEPT_EULA=yes
+      - SA_PASSWORD=Docker111___
+      - SA_USER=sa
+    volumes:
+      - "./sql-scripts:/docker-entrypoint-initdb.d"
+      
+networks:
+  my-network:
